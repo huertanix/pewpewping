@@ -2,12 +2,11 @@
   @file     pewpewping.pde
   @author   David Huerta
   @license  CDL (see CDL-LICENSE.txt)
-
+ 
   Ermahgerd! Shoot the paper website screenshot with the pressure sensor behind 
   it to DDOS! Built for Art Hack Day in San Francisco (http://arthackday.net/gaffta/)
 */
 
-#include <SPI.h>
 #include <WiFi.h>
 
 char ssid[] = "GAFFTA";
@@ -16,8 +15,13 @@ int status = WL_IDLE_STATUS; // wifi radio's status
 int fsrPin = A0; // pressure sensor connected to this pin
 char server[] = "www.mpaa.org";
 WiFiClient client;
+int ledPin = 8;
 
 void setup() {
+    // LED hurr
+  pinMode(ledPin, OUTPUT); // long line into 8, short line into ground
+  digitalWrite(ledPin, LOW); // turn off before we begin
+  
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
@@ -45,10 +49,11 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(ledPin, LOW);
   // check the network connection once every 10 seconds:
   int fsrReading = analogRead(fsrPin);
 
-  if (fsrReading < 1023) { // super-sensitive
+  if (fsrReading < 1020) { // super-sensitive
     Serial.println(fsrReading);
     Serial.println("Starting connection to server...");
     
@@ -58,6 +63,7 @@ void loop() {
       client.println("Host:www.mpaa.org");
       client.println("Connection: close");
       client.println();
+      digitalWrite(ledPin, HIGH);
     }
   }
   
